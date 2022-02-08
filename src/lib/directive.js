@@ -7,9 +7,10 @@ class Scroller {
     const scroller = document.createElement('div')
     scroller.classList.add('el-scrollbar')
     scroller.style.width = '100%'
-    scroller.style.height = '6px'
+    scroller.style.height = '8px'
     scroller.style.position = 'fixed'
     scroller.style.bottom = 0
+    scroller.style.zIndex = 3
 
     this.dom = scroller
 
