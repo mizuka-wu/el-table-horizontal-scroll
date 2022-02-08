@@ -1,6 +1,7 @@
 /**
  * 创建一个scroller的dom
  */
+import { throttle } from 'lodash'
 class Scroller {
   constructor () {
     const scroller = document.createElement('div')
@@ -33,6 +34,14 @@ class Scroller {
 
     this.thumb.style.width = `${thumbWidth}%`
   }
+
+  show () {
+    this.dom.style.display = 'initial'
+  }
+
+  hide () {
+    this.dom.style.display = 'none'
+  }
 }
 
 /** @type {Vue.DirectiveOptions} */
@@ -46,6 +55,25 @@ export const directive = {
     setTimeout(() => {
       scroller.autoSetBarWidth(tableBodyWrapper)
     }, 1000)
+
+    /**
+     * 判断是否滚动到底了
+     */
+    const checkIsScrollBottom = throttle(function () {
+      const viewHeight = window.innerHeight || document.documentElement.clientHeight
+      const { bottom } = tableBodyWrapper.getBoundingClientRect()
+      if (bottom <= viewHeight) {
+        scroller.hide()
+      } else {
+        scroller.show()
+      }
+    }
+    , 1000 / 60)
+    tableBodyWrapper.checkIsScrollBottom = checkIsScrollBottom
+    document.addEventListener('scroll', checkIsScrollBottom)
+  },
+  unbind (el) {
+    document.removeEventListener('scroll', el.checkIsScrollBottom)
   }
 }
 
