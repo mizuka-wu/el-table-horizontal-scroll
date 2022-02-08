@@ -1,28 +1,32 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <el-table :data="data">
+      <el-table-column label="a" prop="a"></el-table-column>
+      <el-table-column label="b" prop="b"></el-table-column>
+      <el-table-column label="c" prop="c"></el-table-column>
+      <el-table-column label="d" prop="d"></el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+  },
+  data () {
+    return {
+      data: Array.from(new Array(100)).map(() => ({
+        a: 1,
+        b: 2,
+        c: 3,
+        d: 4
+      }))
+    }
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
