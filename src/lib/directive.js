@@ -13,6 +13,7 @@ class Scroller {
       throw new Error('need have table element')
     }
     this.targetTableWrapperEl = targetTableWrapperEl
+    this.fullwidth = false
 
     /**
      * 创建相关dom
@@ -86,6 +87,13 @@ class Scroller {
     const widthPercentage = (targetTableWrapperEl.clientWidth * 100 / targetTableWrapperEl.scrollWidth)
     const thumbWidth = Math.min(widthPercentage, 100)
     this.thumb.style.width = `${thumbWidth}%`
+
+    if (thumbWidth >= 100) {
+      this.fullwidth = true
+      this.hideScroller()
+    } else {
+      this.fullwidth = false
+    }
   }
 
   resetThumbPosition () {
@@ -204,7 +212,9 @@ class Scroller {
    * 显示整体
    */
   showScroller () {
-    this.dom.style.display = 'initial'
+    if (!this.fullwidth) {
+      this.dom.style.display = 'initial'
+    }
   }
 
   /**
