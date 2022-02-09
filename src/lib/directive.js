@@ -93,6 +93,7 @@ class Scroller {
       this.hideScroller()
     } else {
       this.fullwidth = false
+      this.checkIsScrollBottom()
     }
   }
 
