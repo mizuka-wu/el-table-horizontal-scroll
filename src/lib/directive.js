@@ -188,7 +188,11 @@ class Scroller {
         offset = clientX - thumbPosition.left - thumbPosition.width
       }
 
-      targetTableWrapperEl.scrollLeft += offset * rate
+      const targetScrollLeft = targetTableWrapperEl.scrollLeft + offset * rate
+      targetTableWrapperEl.scrollTo({
+        left: targetScrollLeft,
+        behavior: 'smooth'
+      })
     }
 
     return function () {
