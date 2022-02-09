@@ -1,13 +1,36 @@
 {
   "name": "el-table-horizontal-scroll",
   "version": "0.1.0",
-  "private": true,
+  "author": {
+    "name": "mizuka",
+    "email": "mizuka.wu@outlook.com",
+    "url": "https://www.mizuka.top"
+  },
+  "keywords": [
+    "vue",
+    "vue",
+    "vue2",
+    "element-ui",
+    "el-scroller",
+    "el-table",
+    "horizontal-scroll"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mizuka-wu/el-table-horizontal-scroll.git"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name el-table-horizontal-scroll ./src/lib/directive.js",
     "build:demo": "vue-cli-service build --dest examples",
     "lint": "vue-cli-service lint"
   },
+  "main": "dist/el-table-horizontal-scroll.umd.js",
+  "files": [
+    "src/components",
+    "vetur",
+    "dist"
+  ],
   "dependencies": {
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",

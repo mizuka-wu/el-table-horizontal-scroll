@@ -27,28 +27,28 @@ export default {
 ### 使用
 
 ```
-        <el-table
-          :data="data"
-          v-horizontal-scroll
-        >
-          <el-table-column
-            fixed="left"
-            label="a"
-            prop="a"
-          ></el-table-column>
-          <el-table-column
-            label="b"
-            prop="b"
-          ></el-table-column>
-          <el-table-column
-            label="c"
-            prop="c"
-          ></el-table-column>
-          <el-table-column
-            label="d"
-            prop="d"
-            width="1600"
-          ></el-table-column>
-        </el-table>
+<el-table
+  :data="data"
+  v-horizontal-scroll
+>
+  <el-table-column
+    fixed="left"
+    label="a"
+    prop="a"
+  ></el-table-column>
+  <el-table-column
+    label="b"
+    prop="b"
+  ></el-table-column>
+  <el-table-column
+    label="c"
+    prop="c"
+  ></el-table-column>
+  <el-table-column
+    label="d"
+    prop="d"
+    width="1600"
+  ></el-table-column>
+</el-table>
 ```
 
