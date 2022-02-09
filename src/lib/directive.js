@@ -49,9 +49,11 @@ class Scroller {
       }
     }.bind(this)
     , 1000 / 60)
-    document.addEventListener('scroll', this.checkIsScrollBottom)
-
-    this.showBar()
+    document.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
+    // 自动同步,table => thumb
+    targetTableEl.addEventListener('scroll', throttle(function () {
+      thumb.style.transform = `translateX(${this.moveX}%)`
+    }.bind(this), 1000 / 60))
     setTimeout(() => {
       this.resetBar()
     }, 1000)
@@ -65,6 +67,11 @@ class Scroller {
     const widthPercentage = (targetTableEl.clientWidth * 100 / targetTableEl.scrollWidth)
     const thumbWidth = Math.min(widthPercentage, 100)
     this.thumb.style.width = `${thumbWidth}%`
+  }
+
+  get moveX () {
+    const { targetTableEl } = this
+    return ((targetTableEl.scrollLeft * 100) / targetTableEl.clientWidth)
   }
 
   /**
