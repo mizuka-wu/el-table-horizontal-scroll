@@ -39,24 +39,38 @@ class Scroller {
     /**
      * 初始化配置
      */
+    const instance = this
     this.checkIsScrollBottom = throttle(function () {
       const viewHeight = window.innerHeight || document.documentElement.clientHeight
       const { bottom } = targetTableEl.getBoundingClientRect()
       if (bottom <= viewHeight) {
-        this.hideScroller()
+        instance.hideScroller()
       } else {
-        this.showScroller()
+        instance.showScroller()
       }
-    }.bind(this)
+    }
     , 1000 / 60)
     document.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
+
     // 自动同步,table => thumb
     targetTableEl.addEventListener('scroll', throttle(function () {
-      thumb.style.transform = `translateX(${this.moveX}%)`
-    }.bind(this), 1000 / 60))
+      instance.thumb.style.transform = `translateX(${instance.moveX}%)`
+    }, 1000 / 60))
+
+    // 监听table的dom变化，自动重新设置
+    this.tableElObserver = new MutationObserver(function () {
+      setTimeout(() => {
+        instance.resetBar()
+        instance.resetScroller()
+      })
+    })
+    this.tableElObserver.observe(targetTableEl, {
+      attributeFilter: ['style']
+    })
+    // bar宽度自动重制
     setTimeout(() => {
       this.resetBar()
-    }, 1000)
+    }, 0)
   }
 
   /**
@@ -110,13 +124,14 @@ class Scroller {
   }
 
   destory () {
+    this.tableElObserver.disconnect()
     document.removeEventListener('scroll', this.checkIsScrollBottom)
   }
 }
 
 /** @type {Vue.DirectiveOptions} */
 export const directive = {
-  inserted (el) {
+  inserted (el, binding) {
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper')
     const scroller = new Scroller(tableBodyWrapper)
     el.appendChild(scroller.dom)
