@@ -69,7 +69,7 @@ class Scroller {
         instance.resetThumbPosition()
       })
     })
-    this.tableElObserver.observe(targetTableWrapperEl, {
+    this.tableElObserver.observe(targetTableWrapperEl.querySelector('.el-table__body'), {
       attributeFilter: ['style']
     })
     // bar宽度自动重制
