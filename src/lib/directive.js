@@ -54,7 +54,7 @@ class Scroller {
 
     // 自动同步,table => thumb
     targetTableEl.addEventListener('scroll', throttle(function () {
-      instance.thumb.style.transform = `translateX(${instance.moveX}%)`
+      instance.resetThumbPosition()
     }, 1000 / 60))
 
     // 监听table的dom变化，自动重新设置
@@ -62,6 +62,7 @@ class Scroller {
       setTimeout(() => {
         instance.resetBar()
         instance.resetScroller()
+        instance.resetThumbPosition()
       })
     })
     this.tableElObserver.observe(targetTableEl, {
@@ -81,6 +82,10 @@ class Scroller {
     const widthPercentage = (targetTableEl.clientWidth * 100 / targetTableEl.scrollWidth)
     const thumbWidth = Math.min(widthPercentage, 100)
     this.thumb.style.width = `${thumbWidth}%`
+  }
+
+  resetThumbPosition () {
+    this.thumb.style.transform = `translateX(${this.moveX}%)`
   }
 
   resetScroller () {
