@@ -123,8 +123,14 @@ class Scroller {
         }
         const { clientX } = e
         const offset = clientX - tempClientX
+        const originTempClientX = tempClientX
         tempClientX = clientX
+
+        const tempScrollleft = targetTableWrapperEl.scrollLeft
         targetTableWrapperEl.scrollLeft += offset * rate
+        if (tempScrollleft === targetTableWrapperEl.scrollLeft) {
+          tempClientX = originTempClientX
+        }
       }, 1000 / 60)
     /** @param {MouseEvent} e */
     function mouseUpDocumentHandler () {
