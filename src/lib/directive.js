@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /**
  * 创建一个scroller的dom
  */
@@ -5,13 +6,13 @@ import { throttle } from 'lodash'
 class Scroller {
   /**
    * 给tableBody创建一个scroller
-   * @param {Element} targetTableEl
+   * @param {Element} targetTableWrapperEl
    */
-  constructor (targetTableEl) {
-    if (!targetTableEl) {
+  constructor (targetTableWrapperEl) {
+    if (!targetTableWrapperEl) {
       throw new Error('need have table element')
     }
-    this.targetTableEl = targetTableEl
+    this.targetTableWrapperEl = targetTableWrapperEl
 
     /**
      * 创建相关dom
@@ -42,7 +43,7 @@ class Scroller {
     const instance = this
     this.checkIsScrollBottom = throttle(function () {
       const viewHeight = window.innerHeight || document.documentElement.clientHeight
-      const { bottom } = targetTableEl.getBoundingClientRect()
+      const { bottom } = targetTableWrapperEl.getBoundingClientRect()
       if (bottom <= viewHeight) {
         instance.hideScroller()
       } else {
@@ -52,10 +53,13 @@ class Scroller {
     , 1000 / 60)
     document.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
 
-    // 自动同步,table => thumb
-    targetTableEl.addEventListener('scroll', throttle(function () {
+    // 自动同步,table => scroller
+    targetTableWrapperEl.addEventListener('scroll', throttle(function () {
       instance.resetThumbPosition()
     }, 1000 / 60))
+
+    // 自动同步 scroller => table
+    this.syncDestoryHandler = this.initScrollSyncHandler()
 
     // 监听table的dom变化，自动重新设置
     this.tableElObserver = new MutationObserver(function () {
@@ -65,21 +69,21 @@ class Scroller {
         instance.resetThumbPosition()
       })
     })
-    this.tableElObserver.observe(targetTableEl, {
+    this.tableElObserver.observe(targetTableWrapperEl, {
       attributeFilter: ['style']
     })
     // bar宽度自动重制
     setTimeout(() => {
       this.resetBar()
-    }, 0)
+    })
   }
 
   /**
    * 自动设置Bar
    */
   resetBar () {
-    const { targetTableEl } = this
-    const widthPercentage = (targetTableEl.clientWidth * 100 / targetTableEl.scrollWidth)
+    const { targetTableWrapperEl } = this
+    const widthPercentage = (targetTableWrapperEl.clientWidth * 100 / targetTableWrapperEl.scrollWidth)
     const thumbWidth = Math.min(widthPercentage, 100)
     this.thumb.style.width = `${thumbWidth}%`
   }
@@ -89,15 +93,76 @@ class Scroller {
   }
 
   resetScroller () {
-    const { targetTableEl, dom } = this
-    const boundingClientRect = targetTableEl.getBoundingClientRect()
+    const { targetTableWrapperEl, dom } = this
+    const boundingClientRect = targetTableWrapperEl.getBoundingClientRect()
     dom.style.left = boundingClientRect.left + 'px'
     dom.style.width = boundingClientRect.width + 'px'
   }
 
   get moveX () {
-    const { targetTableEl } = this
-    return ((targetTableEl.scrollLeft * 100) / targetTableEl.clientWidth)
+    const { targetTableWrapperEl } = this
+    return ((targetTableWrapperEl.scrollLeft * 100) / targetTableWrapperEl.clientWidth)
+  }
+
+  /**
+   * 让scroller的拖动行为和table的同步
+   * 处理类似element-ui的拖拽处理
+   */
+  initScrollSyncHandler () {
+    let cursorDown = false
+    let tempClientX = 0
+    let rate = 1
+
+    const { thumb, targetTableWrapperEl, bar } = this
+
+    const mouseMoveDocumentHandler = throttle(
+      /** @param {MouseEvent} e */
+      function (e) {
+        if (cursorDown === false) {
+          return
+        }
+        const { clientX } = e
+        const offset = clientX - tempClientX
+        tempClientX = clientX
+        targetTableWrapperEl.scrollLeft += offset * rate
+      }, 1000 / 60)
+    /** @param {MouseEvent} e */
+    function mouseUpDocumentHandler () {
+      cursorDown = false
+      document.removeEventListener('mousemove', mouseMoveDocumentHandler)
+      document.removeEventListener('mouseup', mouseUpDocumentHandler)
+      document.onselectstart = null
+    }
+
+    /**
+     * 拖拽处理
+     * @param {MouseEvent} e
+     */
+    function startDrag (e) {
+      e.stopImmediatePropagation()
+      cursorDown = true
+      document.addEventListener('mousemove', mouseMoveDocumentHandler)
+      document.addEventListener('mouseup', mouseUpDocumentHandler)
+      document.onselectstart = () => false
+    }
+
+    thumb.onmousedown = function (e) {
+      // prevent click event of right button
+      if (e.ctrlKey || e.button === 2) {
+        return
+      }
+
+      // 计算一下变换比例，拖拽走的是具体数字，但是这个实际上应该是按照比例变的
+      rate = bar.offsetWidth / thumb.offsetWidth
+
+      const { clientX } = e
+      tempClientX = clientX
+      startDrag(e)
+    }
+
+    return function () {
+      document.removeEventListener('mouseup', mouseUpDocumentHandler)
+    }
   }
 
   /**
@@ -131,6 +196,7 @@ class Scroller {
   destory () {
     this.tableElObserver.disconnect()
     document.removeEventListener('scroll', this.checkIsScrollBottom)
+    this.syncDestoryHandler()
   }
 }
 
