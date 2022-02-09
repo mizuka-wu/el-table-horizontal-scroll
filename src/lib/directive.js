@@ -115,6 +115,11 @@ class Scroller {
 
     const { thumb, targetTableWrapperEl, bar } = this
 
+    function getRate () {
+      // 计算一下变换比例，拖拽走的是具体数字，但是这个实际上应该是按照比例变的
+      return bar.offsetWidth / thumb.offsetWidth
+    }
+
     const mouseMoveDocumentHandler = throttle(
       /** @param {MouseEvent} e */
       function (e) {
@@ -158,12 +163,32 @@ class Scroller {
         return
       }
 
-      // 计算一下变换比例，拖拽走的是具体数字，但是这个实际上应该是按照比例变的
-      rate = bar.offsetWidth / thumb.offsetWidth
-
       const { clientX } = e
       tempClientX = clientX
+      rate = getRate()
       startDrag(e)
+    }
+
+    /**
+     * 点击槽快速移动
+     * @param {PointerEvent} e
+     */
+    bar.onclick = function (e) {
+      const { target } = e
+      if (target !== bar) {
+        return
+      }
+      rate = getRate()
+      const { clientX } = e
+      let offset = 0
+      const thumbPosition = thumb.getBoundingClientRect()
+      if (thumbPosition.left >= clientX) {
+        offset = (clientX - thumbPosition.left)
+      } else {
+        offset = clientX - thumbPosition.left - thumbPosition.width
+      }
+
+      targetTableWrapperEl.scrollLeft += offset * rate
     }
 
     return function () {
