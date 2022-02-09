@@ -1,5 +1,5 @@
 # el-table-horizontal-scroll
-〉 让el-table支持横向滚动条一直在底部显示
+> 让el-table支持横向滚动条一直在底部显示
 ## 使用方法
 
 ### 安装
