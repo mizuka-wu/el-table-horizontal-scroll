@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name el-table-horizontal-scroll ./src/lib/directive.js",
+    "build:demo": "vue-cli-service build --dest examples",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
