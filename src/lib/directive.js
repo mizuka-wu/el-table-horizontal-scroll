@@ -18,13 +18,13 @@ class Scroller {
      */
     const scroller = document.createElement('div')
     scroller.classList.add('el-scrollbar')
-    scroller.style.width = '100%'
     scroller.style.height = '8px'
     scroller.style.position = 'fixed'
     scroller.style.bottom = 0
     scroller.style.zIndex = 3
 
     this.dom = scroller
+    this.resetScroller()
 
     const bar = document.createElement('div')
     bar.classList.add('el-scrollbar__bar', 'is-horizontal')
@@ -67,6 +67,13 @@ class Scroller {
     const widthPercentage = (targetTableEl.clientWidth * 100 / targetTableEl.scrollWidth)
     const thumbWidth = Math.min(widthPercentage, 100)
     this.thumb.style.width = `${thumbWidth}%`
+  }
+
+  resetScroller () {
+    const { targetTableEl, dom } = this
+    const boundingClientRect = targetTableEl.getBoundingClientRect()
+    dom.style.left = boundingClientRect.left + 'px'
+    dom.style.width = boundingClientRect.width + 'px'
   }
 
   get moveX () {
