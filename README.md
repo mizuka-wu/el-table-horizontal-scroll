@@ -2,6 +2,8 @@
 > 让el-table支持横向滚动条一直在底部显示
 ## 使用方法
 
+![](./res.gif)
+
 ### 安装
 ```
 npm install el-table-horizontal-scroll
