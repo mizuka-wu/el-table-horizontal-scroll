@@ -68,6 +68,7 @@ class Scroller {
         instance.resetBar()
         instance.resetScroller()
         instance.resetThumbPosition()
+        instance.checkIsScrollBottom()
       })
     })
     this.tableElObserver.observe(targetTableWrapperEl.querySelector('.el-table__body'), {
