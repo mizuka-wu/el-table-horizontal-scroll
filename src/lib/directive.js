@@ -7,13 +7,15 @@ class Scroller {
   /**
    * 给tableBody创建一个scroller
    * @param {Element} targetTableWrapperEl
+   * @param {string} mode
    */
-  constructor (targetTableWrapperEl) {
+  constructor (targetTableWrapperEl, mode = 'hover') {
     if (!targetTableWrapperEl) {
       throw new Error('need have table element')
     }
     this.targetTableWrapperEl = targetTableWrapperEl
     this.fullwidth = false
+    this.mode = mode
 
     /**
      * 创建相关dom
@@ -48,6 +50,10 @@ class Scroller {
       if (bottom <= viewHeight) {
         instance.hideScroller()
       } else {
+        // 需要重新设置一次当前宽度
+        instance.resetBar(false)
+
+        // 显示当前的bar
         instance.showScroller()
       }
     }
@@ -71,30 +77,42 @@ class Scroller {
         instance.checkIsScrollBottom()
       })
     })
-    this.tableElObserver.observe(targetTableWrapperEl.querySelector('.el-table__body'), {
-      attributeFilter: ['style']
-    })
+    this.tableElObserver.observe(
+      targetTableWrapperEl.querySelector('.el-table__body'),
+      {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style']
+      }
+    )
     // bar宽度自动重制
     setTimeout(() => {
       this.resetBar()
-    })
+      this.resetScroller()
+      this.resetThumbPosition()
+      this.checkIsScrollBottom()
+    }, 500)
   }
 
   /**
    * 自动设置Bar
+   * @param {boolean} changeScrollerVisible 是否开启自动设置滚动条显示与否
    */
-  resetBar () {
+  resetBar (changeScrollerVisible = true) {
     const { targetTableWrapperEl } = this
     const widthPercentage = (targetTableWrapperEl.clientWidth * 100 / targetTableWrapperEl.scrollWidth)
     const thumbWidth = Math.min(widthPercentage, 100)
     this.thumb.style.width = `${thumbWidth}%`
 
-    if (thumbWidth >= 100) {
-      this.fullwidth = true
-      this.hideScroller()
-    } else {
-      this.fullwidth = false
-      this.checkIsScrollBottom()
+    this.fullwidth = thumbWidth >= 100
+
+    if (changeScrollerVisible) {
+      if (this.fullwidth) {
+        this.hideScroller()
+      } else {
+        this.checkIsScrollBottom()
+      }
     }
   }
 
@@ -223,7 +241,11 @@ class Scroller {
    * 隐藏整体
    */
   hideScroller () {
-    this.dom.style.display = 'none'
+    if (this.mode === 'force') {
+      this.mode.style.display = 'initial'
+    } else {
+      this.dom.style.display = 'none'
+    }
   }
 
   /**
@@ -237,7 +259,11 @@ class Scroller {
    * 隐藏滚动条
    */
   hideBar () {
-    this.bar.style.opacity = 0
+    if (this.mode === 'force') {
+      this.bar.style.opacity = 1
+    } else {
+      this.bar.style.opacity = 0
+    }
   }
 
   destory () {
@@ -250,13 +276,13 @@ class Scroller {
 /** @type {Vue.DirectiveOptions} */
 export const directive = {
   inserted (el, binding) {
+    const { value = 'hover' } = binding
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper')
-    const scroller = new Scroller(tableBodyWrapper)
+    const scroller = new Scroller(tableBodyWrapper, value)
 
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
 
-    const { value = 'hover' } = binding
     if (value === 'hover') {
       el.addEventListener('mouseover', scroller.showBar.bind(scroller))
       el.addEventListener('mouseleave', scroller.hideBar.bind(scroller))
