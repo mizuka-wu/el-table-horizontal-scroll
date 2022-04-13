@@ -1,25 +1,25 @@
 # el-table-horizontal-scroll
 
-> let el-table show horizontal scroll-bar at bottom
+> 让el-table支持横向滚动条一直在底部显示
 
-## How to use
+## 使用方法
 
 ![](./res.gif)
 
-### install
+### 安装
 
 ```
 npm install el-table-horizontal-scroll
 ```
 
-### register directive
+### 注册全局指令
 
 ```
 import horizontalScroll from 'el-table-horizontal-scroll'
 Vue.use(horizontalScroll)
 ```
 
-or
+### 局部指令
 
 ```
 import horizontalScroll from 'el-table-horizontal-scroll'
@@ -31,7 +31,7 @@ export default {
 }
 ```
 
-### use
+### 使用
 
 ```
 <el-table
@@ -59,15 +59,15 @@ export default {
 </el-table>
 ```
 
-## props
+## bar显示模式
 
-you can use `always` or `hover`
+可选方法为`always`和`hover`
 
-default is `hover`, the bar will show when your mouse over the table
+不输入的情况下默认为`hover`即鼠标移入`table`的`el`才显示
 
-or you can change it to always, and make the bar always show
+可以改为`always`让`bar`一直显示
 
-example
+例子
 
 ```
 <el-table

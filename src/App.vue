@@ -3,7 +3,11 @@
     <div>
         <router-link to="/">Go to /</router-link>
         <br/>
-        <router-link to="/fixed">Go to Fixed</router-link>
+        <router-link to="/fixed">Go to Fixed Table</router-link>
+        <br/>
+        <router-link to="/always">Go to always show bar</router-link>
+        <br/>
+        <button @click="goBack">go back</button>
     </div>
     <div>
       <router-view/>
@@ -16,6 +20,11 @@
 export default {
   name: 'App',
   components: {
+  },
+  methods: {
+    goBack () {
+      this.$router.go(-1)
+    }
   }
 }
 </script>

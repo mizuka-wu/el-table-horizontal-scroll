@@ -252,10 +252,17 @@ export const directive = {
   inserted (el, binding) {
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper')
     const scroller = new Scroller(tableBodyWrapper)
+
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
-    el.addEventListener('mouseover', scroller.showBar.bind(scroller))
-    el.addEventListener('mouseleave', scroller.hideBar.bind(scroller))
+
+    const { value = 'hover' } = binding
+    if (value === 'hover') {
+      el.addEventListener('mouseover', scroller.showBar.bind(scroller))
+      el.addEventListener('mouseleave', scroller.hideBar.bind(scroller))
+    } else {
+      scroller.showBar()
+    }
   },
   unbind (el) {
     el.horizontalScroll.destory()

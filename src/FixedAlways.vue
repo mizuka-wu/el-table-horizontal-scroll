@@ -1,9 +1,9 @@
 <template>
 <div>
-            <h3>fixed</h3>
+            <h3>always show bar</h3>
         <el-table
           :data="data"
-          v-h-scroll
+          v-h-scroll="'always'"
         >
           <el-table-column
             fixed="left"
