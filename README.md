@@ -2,6 +2,8 @@
 
 > let el-table show horizontal scroll-bar at bottom
 
+[中文文档]('./README_CN.md')
+
 ## How to use
 
 ![](./res.gif)
