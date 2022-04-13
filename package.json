@@ -35,7 +35,9 @@
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
     "lodash": "^4.17.21",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-route": "^1.5.1",
+    "vue-router": "^3.5.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
