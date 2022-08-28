@@ -2,6 +2,8 @@
 
 > 让el-table支持横向滚动条一直在底部显示
 
+支持vue2 + vue3
+
 ## 使用方法
 
 ![](./res.gif)
@@ -16,7 +18,12 @@ npm install el-table-horizontal-scroll
 
 ```
 import horizontalScroll from 'el-table-horizontal-scroll'
+
+# vue2
 Vue.use(horizontalScroll)
+
+# vue3
+app.use(horizontalScroll)
 ```
 
 ### 局部指令
