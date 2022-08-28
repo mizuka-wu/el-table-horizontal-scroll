@@ -274,7 +274,7 @@ class Scroller {
 }
 
 /** @type {Vue.DirectiveOptions} */
-export const directive = {
+export const directiveVue2 = {
   inserted (el, binding) {
     const { value = 'hover' } = binding
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper')
@@ -295,13 +295,21 @@ export const directive = {
   }
 }
 
+export const directiveVue3 = {
+  mounted: directiveVue2.inserted,
+  unmounted: directiveVue2.unbind
+}
+
 /**
  * 插件
  * @type {VuePlugin}
  */
 export const Plugin = {
   install (Vue) {
-    Vue.directive('horizontalScroll', directive)
+    Vue.directive('horizontalScroll', {
+      ...directiveVue2,
+      ...directiveVue3
+    })
   }
 }
 

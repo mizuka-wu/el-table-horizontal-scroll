@@ -2,6 +2,8 @@
 
 > let el-table show horizontal scroll-bar at bottom
 
+support vue2 and vue3
+
 [中文文档]('./README_CN.md')
 
 ## How to use
@@ -18,7 +20,12 @@ npm install el-table-horizontal-scroll
 
 ```
 import horizontalScroll from 'el-table-horizontal-scroll'
+
+# vue2
 Vue.use(horizontalScroll)
+
+# vue3
+app.use(horizontalScroll)
 ```
 
 or
