@@ -296,9 +296,31 @@ export const directiveVue2 = {
 }
 
 export const directiveVue3 = {
-  mounted: directiveVue2.inserted,
-  unmounted: directiveVue2.unbind
+  mounted (el, binding) {
+    const { value = 'hover' } = binding
+    const tableBodyWrapper = el.querySelector('.el-table__body-wrapper .el-scrollbar__wrap')
+    if (!tableBodyWrapper) {
+      console.info("未找到可挂载的对象")
+      return 
+    }
+    const scroller = new Scroller(tableBodyWrapper, value)
+
+    el.appendChild(scroller.dom)
+    el.horizontalScroll = scroller
+
+    if (value === 'hover') {
+      el.addEventListener('mouseover', scroller.showBar.bind(scroller))
+      el.addEventListener('mouseleave', scroller.hideBar.bind(scroller))
+    } else {
+      scroller.showBar()
+    }
+  },
+  unmounted (el) {
+    el.horizontalScroll && el.horizontalScroll.destory()
+  }
 }
+
+el-scrollbar__wrap
 
 /**
  * 插件
