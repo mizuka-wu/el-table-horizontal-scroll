@@ -300,8 +300,8 @@ export const directiveVue3 = {
     const { value = 'hover' } = binding
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper .el-scrollbar__wrap')
     if (!tableBodyWrapper) {
-      console.info("未找到可挂载的对象")
-      return 
+      console.info('未找到可挂载的对象')
+      return
     }
     const scroller = new Scroller(tableBodyWrapper, value)
 
@@ -319,8 +319,6 @@ export const directiveVue3 = {
     el.horizontalScroll && el.horizontalScroll.destory()
   }
 }
-
-el-scrollbar__wrap
 
 /**
  * 插件
