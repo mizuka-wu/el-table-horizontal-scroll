@@ -106,4 +106,6 @@ example
 
 ## How to change scrollbar‘s height
 
-`.el-scrollbar__bar.is-horizontal`
+`.el-table-horizontal-scrollbarl`
+
+manual add style to this class
