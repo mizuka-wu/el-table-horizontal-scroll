@@ -88,7 +88,6 @@ class Scroller {
     )
 
     this.tableResizeObserver = new ResizeObserver(function () {
-      console.log('resize')
       setTimeout(() => {
         instance.resetBar()
         instance.resetScroller()

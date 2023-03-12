@@ -105,4 +105,4 @@ export default {
 ## 修改滚动条高度方案
 
 目前采用了el-scroller的class
-直接给table下的`.el-scrollbar__bar.is-horizontal`增加高度即可
+直接给table下的`.el-table-horizontal-scrollbar`增加对应的style即可
