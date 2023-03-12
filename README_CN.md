@@ -101,3 +101,8 @@ export default {
   ></el-table-column>
 </el-table>
 ```
+
+## 修改滚动条高度方案
+
+目前采用了el-scroller的class
+直接给table下的`.el-scrollbar__bar.is-horizontal`增加高度即可
