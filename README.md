@@ -103,3 +103,7 @@ example
   ></el-table-column>
 </el-table>
 ```
+
+## How to change scrollbar‘s height
+
+`.el-scrollbar__bar.is-horizontal`

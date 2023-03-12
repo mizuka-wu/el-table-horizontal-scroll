@@ -21,7 +21,7 @@ class Scroller {
      * 创建相关dom
      */
     const scroller = document.createElement('div')
-    scroller.classList.add('el-scrollbar')
+    scroller.classList.add('el-scrollbar', 'el-table-horizontal-scrollbar')
     scroller.style.height = '12px'
     scroller.style.position = 'fixed'
     scroller.style.bottom = 0
@@ -86,6 +86,19 @@ class Scroller {
         attributeFilter: ['style']
       }
     )
+
+    this.tableResizeObserver = new ResizeObserver(function () {
+      console.log('resize')
+      setTimeout(() => {
+        instance.resetBar()
+        instance.resetScroller()
+        instance.resetThumbPosition()
+        instance.checkIsScrollBottom()
+      })
+    })
+
+    this.tableResizeObserver.observe(targetTableWrapperEl)
+
     // bar宽度自动重制
     setTimeout(() => {
       this.resetBar()
@@ -268,6 +281,7 @@ class Scroller {
 
   destory () {
     this.tableElObserver.disconnect()
+    this.tableResizeObserver.disconnect()
     document.removeEventListener('scroll', this.checkIsScrollBottom)
     this.syncDestoryHandler()
   }
