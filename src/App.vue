@@ -7,6 +7,8 @@
         <br/>
         <router-link to="/always">Go to always show bar</router-link>
         <br/>
+        <router-link to="/WithCss">Go to see how to change scroll style</router-link>
+        <br/>
         <button @click="goBack">go back</button>
     </div>
     <div>
