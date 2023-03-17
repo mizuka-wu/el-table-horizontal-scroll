@@ -2,7 +2,10 @@
 /**
  * 创建一个scroller的dom
  */
-import { throttle } from 'lodash'
+import { throttle } from 'throttle-debounce'
+
+const THROTTLE_TIME = 1000 / 60
+
 class Scroller {
   /**
    * 给tableBody创建一个scroller
@@ -44,7 +47,7 @@ class Scroller {
      * 初始化配置
      */
     const instance = this
-    this.checkIsScrollBottom = throttle(function () {
+    this.checkIsScrollBottom = throttle(THROTTLE_TIME, function () {
       const viewHeight = window.innerHeight || document.documentElement.clientHeight
       const { bottom } = targetTableWrapperEl.getBoundingClientRect()
       if (bottom <= viewHeight) {
@@ -57,13 +60,13 @@ class Scroller {
         instance.showScroller()
       }
     }
-    , 1000 / 60)
+    )
     document.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
 
     // 自动同步,table => scroller
-    targetTableWrapperEl.addEventListener('scroll', throttle(function () {
+    targetTableWrapperEl.addEventListener('scroll', throttle(THROTTLE_TIME, function () {
       instance.resetThumbPosition()
-    }, 1000 / 60))
+    }))
 
     // 自动同步 scroller => table
     this.syncDestoryHandler = this.initScrollSyncHandler()
@@ -161,6 +164,7 @@ class Scroller {
     }
 
     const mouseMoveDocumentHandler = throttle(
+      THROTTLE_TIME,
       /** @param {MouseEvent} e */
       function (e) {
         if (cursorDown === false) {
@@ -176,7 +180,7 @@ class Scroller {
         if (tempScrollleft === targetTableWrapperEl.scrollLeft) {
           tempClientX = originTempClientX
         }
-      }, 1000 / 60)
+      })
     /** @param {MouseEvent} e */
     function mouseUpDocumentHandler () {
       cursorDown = false
