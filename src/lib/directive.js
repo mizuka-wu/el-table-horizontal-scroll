@@ -19,6 +19,7 @@ class Scroller {
     this.targetTableWrapperEl = targetTableWrapperEl
     this.fullwidth = false
     this.mode = mode
+    this.isVisible = false
 
     /**
      * 创建相关dom
@@ -48,16 +49,25 @@ class Scroller {
      */
     const instance = this
     this.checkIsScrollBottom = throttle(THROTTLE_TIME, function () {
+      if (!instance.isVisible) {
+        instance.hideScroller()
+        return
+      }
       const viewHeight = window.innerHeight || document.documentElement.clientHeight
       const { bottom } = targetTableWrapperEl.getBoundingClientRect()
       if (bottom <= viewHeight) {
         instance.hideScroller()
+        instance.hideBar()
       } else {
         // 需要重新设置一次当前宽度
         instance.resetBar(false)
 
         // 显示当前的bar
         instance.showScroller()
+
+        if (instance.mode === 'always') {
+          instance.showBar()
+        }
       }
     }
     )
@@ -71,43 +81,40 @@ class Scroller {
     // 自动同步 scroller => table
     this.syncDestoryHandler = this.initScrollSyncHandler()
 
-    // 监听table的dom变化，自动重新设置
-    this.tableElObserver = new MutationObserver(function () {
-      setTimeout(() => {
-        instance.resetBar()
-        instance.resetScroller()
-        instance.resetThumbPosition()
-        instance.checkIsScrollBottom()
-      })
-    })
-    this.tableElObserver.observe(
-      targetTableWrapperEl.querySelector('.el-table__body'),
-      {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['style']
-      }
-    )
+    this.tableElObserver = null
 
-    this.tableResizeObserver = new ResizeObserver(function () {
-      setTimeout(() => {
-        instance.resetBar()
-        instance.resetScroller()
-        instance.resetThumbPosition()
-        instance.checkIsScrollBottom()
-      })
-    })
+    if (MutationObserver) {
+      // 监听table的dom变化，自动重新设置
+      this.tableElObserver = new MutationObserver(() => this.forceUpdate())
+      this.tableElObserver.observe(
+        targetTableWrapperEl.querySelector('.el-table__body'),
+        {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['style']
+        }
+      )
+    }
 
-    this.tableResizeObserver.observe(targetTableWrapperEl)
+    this.tableResizeObserver = null
+
+    if (ResizeObserver) {
+      this.tableResizeObserver = new ResizeObserver(() => this.forceUpdate())
+      this.tableResizeObserver.observe(targetTableWrapperEl)
+    }
+
+    this.tableIn = null
+    if (IntersectionObserver) {
+      this.tableIntersectionObserver = new IntersectionObserver(([entry]) => {
+        this.isVisible = entry.intersectionRatio > 0
+        this.forceUpdate()
+      })
+      this.tableIntersectionObserver.observe(targetTableWrapperEl)
+    }
 
     // bar宽度自动重制
-    setTimeout(() => {
-      this.resetBar()
-      this.resetScroller()
-      this.resetThumbPosition()
-      this.checkIsScrollBottom()
-    }, 500)
+    this.forceUpdate()
   }
 
   /**
@@ -140,6 +147,15 @@ class Scroller {
     const boundingClientRect = targetTableWrapperEl.getBoundingClientRect()
     dom.style.left = boundingClientRect.left + 'px'
     dom.style.width = boundingClientRect.width + 'px'
+  }
+
+  forceUpdate () {
+    setTimeout(() => {
+      this.resetBar()
+      this.resetScroller()
+      this.resetThumbPosition()
+      this.checkIsScrollBottom()
+    }, THROTTLE_TIME)
   }
 
   get moveX () {
@@ -257,17 +273,16 @@ class Scroller {
    * 隐藏整体
    */
   hideScroller () {
-    if (this.mode === 'force') {
-      this.mode.style.display = 'initial'
-    } else {
-      this.dom.style.display = 'none'
-    }
+    this.dom.style.display = 'none'
   }
 
   /**
    * 显示滚动条
    */
   showBar () {
+    if (!this.isVisible) {
+      return
+    }
     this.bar.style.opacity = 1
   }
 
@@ -275,7 +290,11 @@ class Scroller {
    * 隐藏滚动条
    */
   hideBar () {
-    if (this.mode === 'force') {
+    if (!this.isVisible) {
+      this.bar.style.opacity = 0
+      return
+    }
+    if (this.mode === 'always') {
       this.bar.style.opacity = 1
     } else {
       this.bar.style.opacity = 0
@@ -283,9 +302,10 @@ class Scroller {
   }
 
   destory () {
-    this.tableElObserver.disconnect()
-    this.tableResizeObserver.disconnect()
     document.removeEventListener('scroll', this.checkIsScrollBottom)
+    this.tableElObserver && this.tableElObserver.disconnect()
+    this.tableResizeObserver && this.tableResizeObserver.disconnect()
+    this.tableIntersectionObserver && this.tableIntersectionObserver.disconnect()
     this.syncDestoryHandler()
   }
 }

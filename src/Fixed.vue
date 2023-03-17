@@ -7,6 +7,7 @@
       <el-table-column label="c" prop="c"></el-table-column>
       <el-table-column label="d" prop="d" width="500"></el-table-column>
     </el-table>
+    <div style="height: 100vh"></div>
   </div>
 </template>
 <script>
