@@ -109,3 +109,14 @@ example
 `.el-table-horizontal-scrollbarl`
 
 manual add style to this class
+
+if you think the scroller is so small when hover,
+you can add this to the style
+
+```css
+.el-table-horizontal-scrollbar:hover {
+  transform: scaleY(1.5);
+  filter: brightness(0.1);
+  transform: scaleY(1.75) translateY(-10%);
+}
+```

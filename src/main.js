@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import { Plugin } from './lib/directive'
 import Fixed from './Fixed'
 import FixedAlways from './FixedAlways'
+import WithCss from './WithCss'
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -18,7 +19,8 @@ new Vue({
   router: new VueRouter({
     routes: [
       { path: '/fixed', component: Fixed },
-      { path: '/always', component: FixedAlways }
+      { path: '/always', component: FixedAlways },
+      { path: '/withCss', component: WithCss }
     ]
   })
 }).$mount('#app')

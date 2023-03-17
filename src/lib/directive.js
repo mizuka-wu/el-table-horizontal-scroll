@@ -30,6 +30,7 @@ class Scroller {
     scroller.style.position = 'fixed'
     scroller.style.bottom = 0
     scroller.style.zIndex = 3
+    scroller.style.transition = 'all 0.3s ease'
 
     this.dom = scroller
     this.resetScroller()

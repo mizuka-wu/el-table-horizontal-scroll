@@ -106,3 +106,13 @@ export default {
 
 目前采用了el-scroller的class
 直接给table下的`.el-table-horizontal-scrollbar`增加对应的style即可
+
+例如，如果你觉得鼠标移动上去显示区域太小，你可以增加
+
+```css
+.el-table-horizontal-scrollbar:hover {
+  transform: scaleY(1.5);
+  filter: brightness(0.1);
+  transform: scaleY(1.75) translateY(-10%);
+}
+```
