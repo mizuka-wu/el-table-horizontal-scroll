@@ -19,9 +19,5 @@ export default {
 }
 </script>
 <style>
-.el-table-horizontal-scrollbar:hover {
-  transform: scaleY(1.5);
-  filter: brightness(0.1);
-  transform: scaleY(1.75) translateY(-10%);
-}
+
 </style>
