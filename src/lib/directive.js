@@ -6,6 +6,23 @@ import { throttle } from 'throttle-debounce'
 
 const THROTTLE_TIME = 1000 / 60
 
+/**
+ * 找到最近一个可滚动的容器
+ * @param {Element} el
+ * @returns {Element}
+ */
+function findScrollableWrapper (el) {
+  if (el === document.documentElement || el === null) {
+    return window
+  }
+  const { overflowY } = getComputedStyle(el)
+  if (overflowY === 'auto' || overflowY === 'scroll') {
+    return el
+  }
+
+  return findScrollableWrapper(el.parentElement)
+}
+
 class Scroller {
   /**
    * 给tableBody创建一个scroller
@@ -20,6 +37,7 @@ class Scroller {
     this.fullwidth = false
     this.mode = mode
     this.isVisible = false
+    this.scrollableWrapper = findScrollableWrapper(this.targetTableWrapperEl)
 
     /**
      * 创建相关dom
@@ -54,9 +72,14 @@ class Scroller {
         instance.hideScroller()
         return
       }
-      const viewHeight = window.innerHeight || document.documentElement.clientHeight
-      const { bottom } = targetTableWrapperEl.getBoundingClientRect()
-      if (bottom <= viewHeight) {
+      // 判断底部是否滚动到页面内了
+      const { targetTableWrapperEl, scrollableWrapper } = instance
+      const viewHeight = scrollableWrapper.clientHeight || document.documentElement.clientHeight
+      const scrollTop = scrollableWrapper.scrollTop || document.documentElement.scrollTop
+      const bottom = targetTableWrapperEl.offsetTop + targetTableWrapperEl.offsetHeight
+      const bottomIsVisible = (scrollTop + viewHeight) >= bottom
+
+      if (bottomIsVisible) {
         instance.hideScroller()
         instance.hideBar()
       } else {
@@ -72,7 +95,7 @@ class Scroller {
       }
     }
     )
-    document.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
+    this.scrollableWrapper.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
 
     // 自动同步,table => scroller
     targetTableWrapperEl.addEventListener('scroll', throttle(THROTTLE_TIME, function () {
@@ -303,7 +326,7 @@ class Scroller {
   }
 
   destory () {
-    document.removeEventListener('scroll', this.checkIsScrollBottom)
+    this.scrollableWrapper.removeEventListener('scroll', this.checkIsScrollBottom)
     this.tableElObserver && this.tableElObserver.disconnect()
     this.tableResizeObserver && this.tableResizeObserver.disconnect()
     this.tableIntersectionObserver && this.tableIntersectionObserver.disconnect()
