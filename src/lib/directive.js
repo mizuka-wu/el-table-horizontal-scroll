@@ -6,30 +6,14 @@ import { throttle } from 'throttle-debounce'
 
 const THROTTLE_TIME = 1000 / 60
 
-/**
- * 找到最近一个可滚动的容器
- * @param {Element} el
- * @returns {Element}
- */
-function findScrollableWrapper (el) {
-  if (el === document.documentElement || el === null) {
-    return window
-  }
-  const { overflowY } = getComputedStyle(el)
-  if (overflowY === 'auto' || overflowY === 'scroll') {
-    return el
-  }
-
-  return findScrollableWrapper(el.parentElement)
-}
-
 class Scroller {
   /**
    * 给tableBody创建一个scroller
    * @param {Element} targetTableWrapperEl
+   * @param {Element} bottomIsVisibleObserverEl
    * @param {string} mode
    */
-  constructor (targetTableWrapperEl, scrollableWrapper, mode = 'hover') {
+  constructor (targetTableWrapperEl, bottomIsVisibleObserverEl, mode = 'hover') {
     if (!targetTableWrapperEl) {
       throw new Error('need have table element')
     }
@@ -37,7 +21,7 @@ class Scroller {
     this.fullwidth = false
     this.mode = mode
     this.isVisible = false
-    this.scrollableWrapper = scrollableWrapper
+    this.bottomIsVisibleObserverEl = bottomIsVisibleObserverEl
 
     /**
      * 创建相关dom
@@ -69,20 +53,12 @@ class Scroller {
      * 初始化配置
      */
     const instance = this
+
     this.checkIsScrollBottom = throttle(THROTTLE_TIME, function () {
       if (!instance.isVisible) {
         instance.hideScroller()
         return
       }
-      // 判断底部是否滚动到页面内了
-      const { targetTableWrapperEl, scrollableWrapper } = instance
-      const viewHeight = scrollableWrapper.clientHeight || document.documentElement.clientHeight
-      const scrollTop = scrollableWrapper.scrollTop || document.documentElement.scrollTop
-      const bottom = targetTableWrapperEl.offsetTop + targetTableWrapperEl.offsetHeight
-
-      console.log(viewHeight, scrollTop, bottom)
-
-      instance.bottomIsVisible = (scrollTop + viewHeight) >= bottom
 
       if (instance.bottomIsVisible) {
         instance.hideScroller()
@@ -100,8 +76,6 @@ class Scroller {
       }
     }
     )
-    this.scrollableWrapper.addEventListener('scroll', this.checkIsScrollBottom) // 全局判断是否需要显示scroller
-
     // 自动同步,table => scroller
     targetTableWrapperEl.addEventListener('scroll', throttle(THROTTLE_TIME, function () {
       instance.resetThumbPosition()
@@ -133,13 +107,26 @@ class Scroller {
       this.tableResizeObserver.observe(targetTableWrapperEl)
     }
 
-    this.tableIn = null
+    this.tableIntersectionObserver = null
+    this.bottomIsVisibleObserver = null
     if (IntersectionObserver) {
+      // 本体是否可见
       this.tableIntersectionObserver = new IntersectionObserver(([entry]) => {
         this.isVisible = entry.intersectionRatio > 0
         this.forceUpdate()
       })
       this.tableIntersectionObserver.observe(targetTableWrapperEl)
+
+      // 底部是否可见
+      if (this.bottomIsVisibleObserverEl) {
+        this.bottomIsVisibleObserver = new IntersectionObserver(([entry]) => {
+          this.bottomIsVisible = entry.intersectionRatio > 0
+          this.checkIsScrollBottom()
+        })
+        this.bottomIsVisibleObserver.observe(this.bottomIsVisibleObserverEl)
+      }
+    } else {
+      console.info('IntersectionObserver is not support，directive maybe problem')
     }
 
     // bar宽度自动重制
@@ -331,10 +318,13 @@ class Scroller {
   }
 
   destory () {
-    this.scrollableWrapper.removeEventListener('scroll', this.checkIsScrollBottom)
     this.tableElObserver && this.tableElObserver.disconnect()
     this.tableResizeObserver && this.tableResizeObserver.disconnect()
     this.tableIntersectionObserver && this.tableIntersectionObserver.disconnect()
+    this.bottomIsVisibleObserver && this.bottomIsVisibleObserver.disconnect()
+    if (this.bottomIsVisibleObserverEl && this.bottomIsVisibleObserverEl.parentElement) {
+      this.bottomIsVisibleObserverEl.parentElement.removeChild(this.bottomIsVisibleObserverEl)
+    }
     this.syncDestoryHandler()
   }
 }
@@ -344,9 +334,10 @@ export const directiveVue2 = {
   inserted (el, binding) {
     const { value = 'hover' } = binding
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper')
-    const scrollableWrapper = findScrollableWrapper(el)
-    const scroller = new Scroller(tableBodyWrapper, scrollableWrapper, value)
+    const bottomIsVisibleObserverEl = document.createElement('div')
+    const scroller = new Scroller(tableBodyWrapper, bottomIsVisibleObserverEl, value)
 
+    el.appendChild(bottomIsVisibleObserverEl)
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
 
@@ -370,9 +361,10 @@ export const directiveVue3 = {
       console.info('未找到可挂载的对象')
       return
     }
-    const scrollableWrapper = findScrollableWrapper(el)
-    const scroller = new Scroller(tableBodyWrapper, scrollableWrapper, value)
+    const bottomIsVisibleObserverEl = document.createElement('div')
+    const scroller = new Scroller(tableBodyWrapper, bottomIsVisibleObserverEl, value)
 
+    el.appendChild(bottomIsVisibleObserverEl)
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
 
