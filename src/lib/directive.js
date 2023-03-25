@@ -29,7 +29,7 @@ class Scroller {
    * @param {Element} targetTableWrapperEl
    * @param {string} mode
    */
-  constructor (targetTableWrapperEl, mode = 'hover') {
+  constructor (targetTableWrapperEl, scrollableWrapper, mode = 'hover') {
     if (!targetTableWrapperEl) {
       throw new Error('need have table element')
     }
@@ -37,7 +37,7 @@ class Scroller {
     this.fullwidth = false
     this.mode = mode
     this.isVisible = false
-    this.scrollableWrapper = findScrollableWrapper(this.targetTableWrapperEl)
+    this.scrollableWrapper = scrollableWrapper
 
     /**
      * 创建相关dom
@@ -63,6 +63,8 @@ class Scroller {
     bar.appendChild(thumb)
     this.thumb = thumb
 
+    this.bottomIsVisible = false
+
     /**
      * 初始化配置
      */
@@ -77,9 +79,12 @@ class Scroller {
       const viewHeight = scrollableWrapper.clientHeight || document.documentElement.clientHeight
       const scrollTop = scrollableWrapper.scrollTop || document.documentElement.scrollTop
       const bottom = targetTableWrapperEl.offsetTop + targetTableWrapperEl.offsetHeight
-      const bottomIsVisible = (scrollTop + viewHeight) >= bottom
 
-      if (bottomIsVisible) {
+      console.log(viewHeight, scrollTop, bottom)
+
+      instance.bottomIsVisible = (scrollTop + viewHeight) >= bottom
+
+      if (instance.bottomIsVisible) {
         instance.hideScroller()
         instance.hideBar()
       } else {
@@ -339,7 +344,8 @@ export const directiveVue2 = {
   inserted (el, binding) {
     const { value = 'hover' } = binding
     const tableBodyWrapper = el.querySelector('.el-table__body-wrapper')
-    const scroller = new Scroller(tableBodyWrapper, value)
+    const scrollableWrapper = findScrollableWrapper(el)
+    const scroller = new Scroller(tableBodyWrapper, scrollableWrapper, value)
 
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
@@ -364,7 +370,8 @@ export const directiveVue3 = {
       console.info('未找到可挂载的对象')
       return
     }
-    const scroller = new Scroller(tableBodyWrapper, value)
+    const scrollableWrapper = findScrollableWrapper(el)
+    const scroller = new Scroller(tableBodyWrapper, scrollableWrapper, value)
 
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
