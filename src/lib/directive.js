@@ -362,9 +362,9 @@ export const directiveVue3 = {
       return
     }
     const bottomIsVisibleObserverEl = document.createElement('div')
-    const scroller = new Scroller(tableBodyWrapper, bottomIsVisibleObserverEl, value)
-
     el.appendChild(bottomIsVisibleObserverEl)
+
+    const scroller = new Scroller(tableBodyWrapper, bottomIsVisibleObserverEl, value)
     el.appendChild(scroller.dom)
     el.horizontalScroll = scroller
 
