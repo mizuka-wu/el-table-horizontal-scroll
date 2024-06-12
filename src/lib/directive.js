@@ -342,8 +342,24 @@ export const directiveVue2 = {
     el.horizontalScroll = scroller
 
     if (value === 'hover') {
-      el.addEventListener('mouseover', scroller.showBar.bind(scroller))
-      el.addEventListener('mouseleave', scroller.hideBar.bind(scroller))
+      el.addEventListener('mouseover', scroller.showBar)
+      el.addEventListener('mouseleave', scroller.hideBar)
+    } else if (value === 'hidden') {
+      scroller.hideBar()
+    } else {
+      scroller.showBar()
+    }
+  },
+  update (el, binding) {
+    const { value = 'hover' } = binding
+    const scroller = el.horizontalScroll
+    el.removeEventListener('mouseover', scroller.showBar)
+    el.removeEventListener('mouseleave', scroller.hideBar)
+    if (value === 'hover') {
+      el.addEventListener('mouseover', scroller.showBar)
+      el.addEventListener('mouseleave', scroller.hideBar)
+    } else if (value === 'hidden') {
+      scroller.hideBar()
     } else {
       scroller.showBar()
     }
