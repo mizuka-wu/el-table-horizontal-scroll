@@ -70,7 +70,7 @@ export default {
 
 ## props
 
-you can use `always` or `hover`
+you can use `always` or `hover` or `hidden`
 
 default is `hover`, the bar will show when your mouse over the table
 
